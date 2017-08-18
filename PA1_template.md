@@ -1,15 +1,59 @@
 # Reproducible Research: Peer Assessment 1
-# Trial 1
-## Trial 2
-### Trial 3
-#### Trial 4
+Yazad Jal  
 
 ## Loading and preprocessing the data
 
+We first download the zipfile from the web and save it in the working directory
 
+
+```r
+fileurl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+destfile <- paste0(getwd(),"/","activity.zip")
+download.file(fileurl, destfile, method = "curl", quiet = TRUE)
+```
+
+Then we unzip the downloaded file and get a feel for the data using str
+
+
+```r
+unzip("activity.zip")
+activity <- read.csv("activity.csv")
+str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+To calculate total number steps per day, I created a new data frame called totalsteps and then made a histogram. 
+
+
+```r
+totalsteps<-aggregate(steps~date,data=activity,sum,na.rm=TRUE)
+hist(totalsteps$steps, 
+        col = "royalblue", border = "royalblue", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day",
+        ylim = c(0,30))
+```
+
+![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
 
 ## What is mean total number of steps taken per day?
 
+Calculating the mean and median of the total number of steps taken per day:
+
+
+```r
+mn <- mean(totalsteps$steps)
+md <- median(totalsteps$steps)
+```
+
+
+
+The mean total number of steps per day is 10766.19 and the median is 10765
 
 
 ## What is the average daily activity pattern?
