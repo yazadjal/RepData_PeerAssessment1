@@ -58,7 +58,27 @@ The mean total number of steps per day is 10766.19 and the median is 10765
 
 ## What is the average daily activity pattern?
 
+First I created a new data frame, fivemin, which aggregates the activity on each five minute interval across the 61 days, and then plot it, giving us the average daily activity pattern.
 
+
+```r
+fivemin <- aggregate(steps~interval, data = activity, mean, na.rm=TRUE)
+plot(fivemin$interval, fivemin$steps, type = "l", col = "royalblue", lwd=2,
+     xlab="Hour of Day", ylab="Number of Steps", 
+     main="Average Daily Activity Pattern")
+```
+
+![](PA1_template_files/figure-html/fivemin-1.png)<!-- -->
+
+Computing the five minute interval with the maximum number of steps
+
+```r
+max <- fivemin[which.max(fivemin$steps),]$interval
+max2 <-paste0(0, max)
+max3 <-paste0(0, (max+5))
+```
+
+From 0835 to 0840 is when the maximum exercise happens.
 
 ## Imputing missing values
 
