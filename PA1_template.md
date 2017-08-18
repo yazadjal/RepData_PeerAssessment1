@@ -64,10 +64,11 @@ First I created a new data frame, fivemin, which aggregates the activity on each
 ```r
 fivemin <- aggregate(steps~interval, data = activity, mean, na.rm=TRUE)
 plot(fivemin$interval, fivemin$steps, type = "l", col = "royalblue", lwd=3,
-     xlab="Hour of Day", ylab="Number of Steps", 
+     xlab="Time of Day", ylab="Average Number of Steps", 
      main="Average Daily Activity Pattern", xaxt="n")
 axis(side=1, at = c(0, 400, 800, 1200, 1600, 2000, 2400), 
      labels = c("midnight", "4am", "8am", "12pm", "4pm", "8pm", "midnight"))
+abline(v=835, col="yellowgreen", lty=3, lwd=2)
 ```
 
 ![](PA1_template_files/figure-html/fivemin-1.png)<!-- -->
