@@ -1,5 +1,8 @@
 # Reproducible Research: Peer Assessment 1
-
+# Trial 1
+## Trial 2
+### Trial 3
+#### Trial 4
 
 ## Loading and preprocessing the data
 

@@ -1,17 +1,52 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+author: "Yazad Jal"
+output: html_document
+keep_md: true
 ---
-
 
 ## Loading and preprocessing the data
 
+We first download the zipfile from the web and save it in the working directory
 
+```{r file_download, message=FALSE, warning=FALSE}
+fileurl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+destfile <- paste0(getwd(),"/","activity.zip")
+download.file(fileurl, destfile, method = "curl", quiet = TRUE)
+```
+
+Then we unzip the downloaded file and get a feel for the data using str
+
+```{r data_feel}
+unzip("activity.zip")
+activity <- read.csv("activity.csv")
+str(activity)
+```
+
+To calculate total number steps per day, I created a new data frame called totalsteps and then made a histogram. 
+
+```{r totalsteps}
+totalsteps<-aggregate(steps~date,data=activity,sum,na.rm=TRUE)
+hist(totalsteps$steps, 
+        col = "royalblue", border = "royalblue", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day",
+        ylim = c(0,30))
+```
 
 ## What is mean total number of steps taken per day?
 
+Calculating the mean and median of the total number of steps taken per day:
+
+```{r mean_median}
+mn <- mean(totalsteps$steps)
+md <- median(totalsteps$steps)
+```
+
+```{r, echo=FALSE}
+mnr <- round(mn, digits = 2)
+```
+
+The mean total number of steps per day is `r as.character(mnr)` and the median is `r md`
 
 
 ## What is the average daily activity pattern?
