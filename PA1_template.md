@@ -85,6 +85,145 @@ From 0835 to 0840 is when the maximum exercise happens.
 
 ## Imputing missing values
 
+Calculating and reporting the total number of missing values in the dataset (i.e. the total number of rows with NAs): 
 
+```r
+isna <- sum(is.na(activity$steps))
+```
+
+There are 2304 rows with missing values in the dataset
+
+I've used two strategies to fill in the missing values. The first is using the impute function from the Hmisc package, and creating a new dataset, totalsteps2, and a new histogram. 
+
+
+```r
+library(Hmisc, quietly = TRUE)
+activityImputed <- activity
+activityImputed$steps <- impute(activity$steps, fun=mean)
+totalsteps2<-aggregate(steps~date,data=activityImputed,sum,na.rm=TRUE)
+```
+
+
+```r
+hist(totalsteps2$steps, 
+        col = "red", border = "red", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day",
+        ylim = c(0,35))
+```
+
+![](PA1_template_files/figure-html/Hmisc_impute_hist-1.png)<!-- -->
+
+The new mean and median using this method are:
+
+```r
+mean(totalsteps2$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+median(totalsteps2$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+The mean has statyed the same (it should, as the method imputed the mean and replaced the NA values with it). The median has changed and is now equal to the mean. 
+
+Comparing the histograms:
+
+```r
+par(mfrow=c(1,2))
+hist(totalsteps$steps, 
+        col = "royalblue", border = "royalblue", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day (original)",
+        ylim = c(0,35))
+
+hist(totalsteps2$steps, 
+        col = "red", border = "red", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day (new)",
+        ylim = c(0,35))
+```
+
+![](PA1_template_files/figure-html/comparing_hist1-1.png)<!-- -->
+
+```r
+par(mfrow=c(1,1))
+```
+
+The impact of imputing missing data seems to be to increase the average frequency. 
+
+
+The second method used is k nearest neighbors from the VIM package.
+
+
+```r
+library(VIM)
+act <- activity
+knnact <- kNN(act)
+totalsteps3<-aggregate(steps~date,data=knnact,sum,na.rm=TRUE)
+```
+
+The new mean and median using this method are:
+
+```r
+mean(totalsteps3$steps)
+```
+
+```
+## [1] 9752.393
+```
+
+```r
+median(totalsteps3$steps)
+```
+
+```
+## [1] 10395
+```
+
+The mean and median have both decreased. That is because the method has imputed 0 values for many of the NA values.
+
+
+```r
+hist(totalsteps2$steps, 
+        col = "seagreen3", border = "seagreen3", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day",
+        ylim = c(0,35))
+```
+
+![](PA1_template_files/figure-html/knn_impute_hist-1.png)<!-- -->
+
+Comparing both methods with the original histogram
+
+```r
+par(mfrow=c(1,3))
+hist(totalsteps$steps, 
+        col = "royalblue", border = "royalblue", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day (original)",
+        ylim = c(0,40))
+
+hist(totalsteps2$steps, 
+        col = "red", border = "red", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day (hmisc)",
+        ylim = c(0,40))
+
+hist(totalsteps2$steps, 
+        col = "seagreen3", border = "seagreen3", density = 50,
+        xlab = "Number of Steps", main = "Total steps per day (knn)",
+        ylim = c(0,40))
+```
+
+![](PA1_template_files/figure-html/comparing_hist2-1.png)<!-- -->
+
+```r
+par(mfrow=c(1,1))
+```
+
+
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ## Are there differences in activity patterns between weekdays and weekends?
