@@ -28,11 +28,13 @@ str(activity)
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
+
 To calculate total number steps per day, I created a new data frame called totalsteps and then made a histogram. 
 
 
 ```r
 totalsteps<-aggregate(steps~date,data=activity,sum,na.rm=TRUE)
+par(mfrow=c(1,1))
 hist(totalsteps$steps, 
         col = "royalblue", border = "royalblue", density = 50,
         xlab = "Number of Steps", main = "Total steps per day",
@@ -40,6 +42,7 @@ hist(totalsteps$steps,
 ```
 
 ![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
+
 
 ## What is mean total number of steps taken per day?
 
@@ -58,22 +61,22 @@ The mean total number of steps per day is 10766.19 and the median is 10765
 
 ## What is the average daily activity pattern?
 
-First I created a new data frame, fivemin, which aggregates the activity on each five minute interval across the 61 days, and then plot it, giving us the average daily activity pattern.
+First I created a new data frame, fivemin, which aggregates the activity on each five minute interval across the 61 days, and then I plot it, giving us the average daily activity pattern.
 
 
 ```r
 fivemin <- aggregate(steps~interval, data = activity, mean, na.rm=TRUE)
 plot(fivemin$interval, fivemin$steps, type = "l", col = "royalblue", lwd=3,
-     xlab="Time of Day", ylab="Average Number of Steps", 
+     xlab="Time of Day", ylab="Average Number of Steps", ylim=c(0, 250),
      main="Average Daily Activity Pattern", xaxt="n")
 axis(side=1, at = c(0, 400, 800, 1200, 1600, 2000, 2400), 
      labels = c("midnight", "4am", "8am", "12pm", "4pm", "8pm", "midnight"))
-abline(v=835, col="yellowgreen", lty=3, lwd=2)
 ```
 
 ![](PA1_template_files/figure-html/fivemin-1.png)<!-- -->
 
-Computing the five minute interval with the maximum number of steps
+
+Computing the five minute interval with the maximum number of steps:
 
 ```r
 max <- fivemin[which.max(fivemin$steps),]$interval
@@ -82,6 +85,7 @@ max3 <-paste0(0, (max+5))
 ```
 
 From 0835 to 0840 is when the maximum exercise happens.
+
 
 ## Imputing missing values
 
@@ -150,10 +154,6 @@ hist(totalsteps2$steps,
 
 ![](PA1_template_files/figure-html/comparing_hist1-1.png)<!-- -->
 
-```r
-par(mfrow=c(1,1))
-```
-
 The impact of imputing missing data seems to be to increase the average frequency. 
 
 
@@ -189,6 +189,7 @@ The mean and median have both decreased. That is because the method has imputed 
 
 
 ```r
+par(mfrow=c(1,1))
 hist(totalsteps2$steps, 
         col = "seagreen3", border = "seagreen3", density = 50,
         xlab = "Number of Steps", main = "Total steps per day",
@@ -196,6 +197,7 @@ hist(totalsteps2$steps,
 ```
 
 ![](PA1_template_files/figure-html/knn_impute_hist-1.png)<!-- -->
+
 
 Comparing both methods with the original histogram
 
@@ -219,11 +221,43 @@ hist(totalsteps2$steps,
 
 ![](PA1_template_files/figure-html/comparing_hist2-1.png)<!-- -->
 
-```r
-par(mfrow=c(1,1))
-```
+The impact of imputing missing data seems to increase the average frequency, in both methods.
 
-
-Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+To answer this, I've used the original data frame, activity, (with the NAs) and added a new column denoting weekday / weekend. I then use the filter function from the dplyr package to filter for weekday / weekend and aggregated over the steps in each five minute interval
+
+
+```r
+activity$day <- ifelse(as.POSIXlt(as.Date(activity$date))$wday%%6 == 0,
+                       "weekend", "weekday")
+library(dplyr)
+weekdays <- filter(activity, day == "weekday")
+weekends <- filter(activity, day == "weekend")
+fivemin_wd <- aggregate(steps~interval, data = weekdays, mean, na.rm=TRUE)
+fivemin_we <- aggregate(steps~interval, data = weekends, mean, na.rm=TRUE)
+```
+
+Plotting the weekday and weekend activity patterns in a panel plot:
+
+
+```r
+par(mfrow=c(1,2))
+plot(fivemin_wd$interval, fivemin_wd$steps, type = "l", 
+     col = "royalblue", lwd=3, ylim=c(0, 250),
+     xlab="Time of Day", ylab="Average Number of Steps", 
+     main="Weekday Activity Pattern", xaxt="n")
+axis(side=1, at = c(0, 400, 800, 1200, 1600, 2000, 2400), 
+     labels = c("midnight", "4am", "8am", "12pm", "4pm", "8pm", "midnight"))
+plot(fivemin_we$interval, fivemin_we$steps, type = "l", 
+     col = "red", lwd=3,ylim=c(0, 250),
+     xlab="Time of Day", ylab="Average Number of Steps", 
+     main="Weekend Activity Pattern", xaxt="n")
+axis(side=1, at = c(0, 400, 800, 1200, 1600, 2000, 2400), 
+     labels = c("midnight", "4am", "8am", "12pm", "4pm", "8pm", "midnight"))
+```
+
+![](PA1_template_files/figure-html/weekday_weekend_plot-1.png)<!-- -->
+
+The weekend pattern is significantly different from the weekday pattern. Weekends do not have a unique peak and there are generally fewer steps walked during weekends.
